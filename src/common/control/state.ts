@@ -27,6 +27,7 @@ export enum AppState {
   ELAPSED_TIME_CHART_DIALOG = "elapsedTimeChartDialog",
   NEXT_MOVE_GENERATION_DIALOG = "nextMoveGenerationDialog",
   NEXT_MOVE_GENERATION = "nextMoveGeneration",
+  OEX_ENGINE_SELECTOR_DIALOG = "oexEngineSelectorDialog",
 }
 
 export enum ResearchState {

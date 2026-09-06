@@ -99,7 +99,7 @@ export function defaultGameSettings(opts?: { autoSaveDirectory?: string }): Game
     repeat: 1,
     parallelism: 1,
     swapPlayers: false,
-    maxMoves: 1000,
+    maxMoves: 512,
     jishogiRule: JishogiRule.GENERAL27,
     searchCommentFormat: SearchCommentFormat.SHOGIHOME,
     sprtEnabled: false,
@@ -135,6 +135,9 @@ export function normalizeGameSettings(
       ...settings.sprt,
     },
   };
+  if (result.maxMoves === 1000) {
+    result.maxMoves = 512;
+  }
   if (!result.autoSaveDirectory) {
     result.autoSaveDirectory = removeLastSlash(opts?.autoSaveDirectory || "");
   }

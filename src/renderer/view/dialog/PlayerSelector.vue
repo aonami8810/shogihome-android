@@ -203,12 +203,15 @@ const closePlayerSettings = () => {
   font-size: 0.8em;
 }
 .player-info-key {
-  width: 110px;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 110px;
   height: 100%;
   text-align: left;
   vertical-align: baseline;
 }
 .player-info-value {
+  flex: 1 1 auto;
   height: 100%;
   text-align: left;
   vertical-align: baseline;

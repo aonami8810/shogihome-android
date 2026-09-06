@@ -1,6 +1,6 @@
 <template>
   <DialogFrame @cancel="onClose">
-    <div class="row">
+    <div class="row main-content">
       <div ref="board" class="board" :class="appSettings.positionImageStyle">
         <div v-if="appSettings.positionImageStyle === PositionImageStyle.BOOK" class="book">
           <SimpleBoardView
@@ -392,7 +392,8 @@ const onClose = () => {
 }
 .side-controls {
   margin-left: 10px;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
 }
 .side-controls > .form-item {
   display: flex;
@@ -410,5 +411,14 @@ input.number {
 }
 input.header {
   width: 100%;
+}
+@media (max-width: 600px) {
+  .main-content {
+    flex-direction: column;
+  }
+  .side-controls {
+    margin-left: 0;
+    margin-top: 10px;
+  }
 }
 </style>

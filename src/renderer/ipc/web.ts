@@ -27,6 +27,7 @@ enum STORAGE_KEY {
   GAME_SETTINGS = "gameSetting",
   MATE_SEARCH_SETTINGS = "mateSearchSetting",
   CSA_GAME_SETTINGS_HISTORY = "csaGameSettingHistory",
+  USI_ENGINES = "usiEngines",
 }
 
 const fileCache = new Map<string, ArrayBuffer>();
@@ -161,10 +162,19 @@ export const webAPI: Bridge = {
     localStorage.setItem(STORAGE_KEY.MATE_SEARCH_SETTINGS, json);
   },
   async loadUSIEngines(): Promise<string> {
-    return new USIEngines().json;
+    const json = localStorage.getItem(STORAGE_KEY.USI_ENGINES);
+    console.log("loadUSIEngines called. Found in localStorage:", !!json);
+    if (!json) {
+      const defaultEngines = new USIEngines().json;
+      console.log("loadUSIEngines: Returning default empty list.");
+      return defaultEngines;
+    }
+    return json;
   },
-  async saveUSIEngines(): Promise<void> {
-    // Do Nothing
+  async saveUSIEngines(json: string): Promise<void> {
+    console.log("saveUSIEngines called. Data length:", json.length);
+    localStorage.setItem(STORAGE_KEY.USI_ENGINES, json);
+    console.log("saveUSIEngines: Data saved to localStorage.");
   },
   async loadBookImportSettings(): Promise<string> {
     throw new Error(t.thisFeatureNotAvailableOnWebApp);
@@ -375,13 +385,19 @@ export const webAPI: Bridge = {
     throw new Error(t.thisFeatureNotAvailableOnWebApp);
   },
   async getUSIEngineInfo(): Promise<string> {
-    throw new Error(t.thisFeatureNotAvailableOnWebApp);
+    return "{}";
   },
   async getUSIEngineMetadata(): Promise<string> {
-    throw new Error(t.thisFeatureNotAvailableOnWebApp);
+    return JSON.stringify({ isShellScript: false });
   },
   async sendUSIOptionButtonSignal(): Promise<void> {
     // Do Nothing
+  },
+  async importEngine(): Promise<string> {
+    throw new Error(t.thisFeatureNotAvailableOnWebApp);
+  },
+  async getBinaryInfo(): Promise<{ rawInfo: string }> {
+    return { rawInfo: "" };
   },
   async usiLaunch(): Promise<number> {
     throw new Error(t.thisFeatureNotAvailableOnWebApp);

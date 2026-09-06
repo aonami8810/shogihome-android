@@ -221,20 +221,14 @@
                 </div>
               </div>
             </div>
-            <!-- 早期 ponder -->
-            <div v-if="option.name === 'USI_Ponder' && option.type === 'check'" class="additional">
-              <ToggleButton v-model:value="engine.enableEarlyPonder" :label="t.earlyPonder" />
-              <div v-show="engine.enableEarlyPonder" class="form-group warning">
-                <div class="note">
-                  {{ t.earlyPonderFeatureSendsPonderhitCommandWithYaneuraOusNonStandardOptions }}
-                  {{ t.ifYourEngineNotSupportTheOptionsItMayCauseUnexpectedBehavior }}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <!-- 定跡 (GUI拡張) -->
-        <div v-show="detailed && !filterWords.length" class="row option">
+        <div
+          v-if="!isMobile"
+          v-show="detailed && !filterWords.length"
+          class="row option"
+        >
           <div class="option-name">{{ t.frontendBook }}</div>
           <div class="option-value">
             <div class="row center">
@@ -322,7 +316,7 @@
 <script setup lang="ts">
 import { t, usiOptionNameMap } from "@/common/i18n";
 import { filter as filterString } from "@/common/helpers/string";
-import api from "@/renderer/ipc/api";
+import api, { isMobileWebApp } from "@/renderer/ipc/api";
 import {
   BookMoveSelectionRule,
   compressUSIEngineOptionsClipboardData,
@@ -411,6 +405,7 @@ const optionVisibility = computed(() =>
 const extraBook = ref<USIEngineExtraBookConfig>(emptyUSIEngineExtraBookConfig());
 const machineSpec = ref<MachineSpec>({ cpuCores: 0, memory: 0 });
 const metadata = ref<USIEngineMetadata>({ isShellScript: false });
+const isMobile = isMobileWebApp();
 
 function optionOrder(option: USIEngineOption): number {
   switch (option.name) {
@@ -444,6 +439,7 @@ onMounted(async () => {
     };
     machineSpec.value = await api.getMachineSpec();
   } catch (e) {
+    console.error("Error in USIEngineOptionsDialog.onMounted:", e);
     useErrorStore().add(e);
     emit("cancel");
   } finally {
@@ -518,6 +514,8 @@ const reset = () => {
     }
     option.currentValue = option.default ?? (option.type === "spin" ? 0 : "");
   });
+  // Trigger options array reactivity if needed (though modifying properties usually works for objects in refs)
+  options.value = [...options.value];
 };
 
 const buildEngineOptions = () => {
@@ -614,16 +612,18 @@ const cancel = () => {
 
 <style scoped>
 .option-list {
-  width: 740px;
-  height: calc(100vh - 250px);
+  width: 100%;
+  max-width: 740px;
+  height: auto;
+  max-height: calc(100dvh - 300px);
   padding-bottom: 25px;
-  max-height: 800px;
   overflow: auto;
 }
 .option {
   margin: 5px 5px 0px 5px;
   padding: 5px;
   border-bottom: 1px solid var(--text-separator-color);
+  flex-wrap: wrap;
 }
 .option-filter {
   margin: 0px 5px 5px 5px;
@@ -636,33 +636,41 @@ const cancel = () => {
   width: 100%;
 }
 .option-name {
-  width: 290px;
+  width: 100%;
+  max-width: 290px;
   text-align: left;
-  border-right: 1px solid var(--text-separator-color);
-  margin-right: 10px;
+  border-right: none;
+  margin-right: 0;
+  font-weight: bold;
 }
 .option-name .option-name-original {
   font-size: 0.7em;
+  display: block;
 }
 .option-unchangeable {
-  width: 415px;
+  width: 100%;
+  max-width: 415px;
   text-align: left;
   white-space: pre-wrap;
   word-break: break-all;
 }
 .option-value {
-  width: 415px;
+  width: 100%;
+  max-width: 415px;
   text-align: left;
+  margin-top: 5px;
 }
 .option-value-control {
   margin-right: 10px;
 }
 .option-value-text {
-  width: 380px;
+  width: 100%;
+  max-width: 380px;
   text-align: left;
 }
 .option-value-filename {
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
   text-align: left;
 }
 .option-value-number {
@@ -700,5 +708,22 @@ const cancel = () => {
 }
 .menu > *:not(:first-child) {
   margin-left: 5px;
+}
+@media (min-width: 600px) {
+  .option {
+    flex-wrap: nowrap;
+  }
+  .option-name {
+    width: 290px;
+    border-right: 1px solid var(--text-separator-color);
+    margin-right: 10px;
+    font-weight: normal;
+  }
+  .option-name .option-name-original {
+    display: inline;
+  }
+  .option-value {
+    margin-top: 0;
+  }
 }
 </style>

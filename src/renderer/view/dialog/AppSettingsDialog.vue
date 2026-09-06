@@ -1036,11 +1036,14 @@ const cancel = () => {
 
 <style scoped>
 .tab-selector {
+  width: 100%;
   max-width: 590px;
 }
 .settings {
+  width: 100%;
   max-width: 590px;
-  height: 800px;
+  height: auto;
+  max-height: calc(100dvh - 200px);
   margin-top: 0;
 }
 .subgroup {
@@ -1051,11 +1054,13 @@ const cancel = () => {
   padding-left: 10px;
 }
 input.file-path {
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
 }
 .image-selector {
   display: inline-block;
-  width: 200px;
+  width: 100%;
+  max-width: 200px;
 }
 .color-selector {
   display: inline-block;
@@ -1063,6 +1068,7 @@ input.file-path {
   margin-left: 5px;
 }
 .selector {
+  width: 100%;
   max-width: 400px;
 }
 button.auxiliary {

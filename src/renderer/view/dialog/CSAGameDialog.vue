@@ -471,16 +471,19 @@ const aboutQualityOfCsaProtocol = () => {
 
 <style scoped>
 .form-group:not(.warning) {
-  min-width: 510px;
+  width: 100%;
+  max-width: 510px;
 }
 input.number {
   width: 100px;
 }
 .long-text {
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
 }
 .file-path {
-  width: 180px;
+  width: 100%;
+  max-width: 180px;
 }
 .main-buttons button {
   line-height: 150%;

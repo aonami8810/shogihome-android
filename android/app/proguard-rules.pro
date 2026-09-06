@@ -1,0 +1,2 @@
+-keep class jp.shogihome.app.USIEnginePlugin { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }

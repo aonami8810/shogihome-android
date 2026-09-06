@@ -407,7 +407,7 @@ export function defaultAppSettings(opt?: {
     translateEngineOptionName: true,
     engineTimeoutSeconds: 10,
     nodeCountFormat: NodeCountFormat.COMMA_SEPARATED,
-    showEngineOptionDetails: false,
+    showEngineOptionDetails: true,
     evaluationViewFrom: EvaluationViewFrom.EACH,
     maxArrowsPerEngine: 3,
     arrowScoreDiffRange: 100,

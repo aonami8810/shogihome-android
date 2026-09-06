@@ -160,61 +160,61 @@ export const compactHandParams = {
 
 export const compactViewParams = {
   frame: {
-    width: 1088,
-    height: 1015,
+    width: 1068,
+    height: 960,
   },
   board: {
-    x: 105,
-    y: 56,
+    x: 95,
+    y: 0,
   },
   hand: {
     black: {
-      x: 993,
-      y: 287,
+      x: 973,
+      y: 0,
     },
     white: {
       x: 0,
-      y: 56,
+      y: 232,
     },
   },
   turn: {
     black: {
-      x: 575,
-      y: 3,
+      x: 973,
+      y: 804,
     },
     white: {
-      x: 304,
-      y: 3,
+      x: 0,
+      y: 104,
     },
-    width: 214,
+    width: 95,
     height: 50,
-    fontSize: 30,
+    fontSize: 20,
   },
   playerName: {
     black: {
-      x: 788,
-      y: 0,
+      x: 973,
+      y: 908,
     },
     white: {
       x: 0,
       y: 0,
     },
-    width: 300,
+    width: 95,
     height: 52,
-    fontSize: 25,
+    fontSize: 18,
   },
   clock: {
     black: {
-      x: 575,
-      y: 0,
+      x: 973,
+      y: 856,
     },
     white: {
-      x: 300,
-      y: 0,
+      x: 0,
+      y: 52,
     },
-    width: 214,
+    width: 95,
     height: 52,
-    fontSize: 30,
+    fontSize: 20,
   },
 };
 

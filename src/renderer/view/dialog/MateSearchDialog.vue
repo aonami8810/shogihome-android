@@ -2,6 +2,7 @@
   <DialogFrame @cancel="onCancel">
     <div class="root">
       <div class="title">{{ t.mateSearch }}</div>
+    <div class="main-content scroll">
       <div class="form-group">
         <PlayerSelector
           v-model:player-uri="engineURI"
@@ -28,6 +29,7 @@
           <div class="form-item-small-label">{{ t.secondsSuffix }}{{ t.toSuffix }}</div>
         </div>
       </div>
+    </div>
       <div class="main-buttons">
         <button data-hotkey="Enter" autofocus @click="onStart()">
           {{ t.startMateSearch }}

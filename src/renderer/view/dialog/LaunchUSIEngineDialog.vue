@@ -90,6 +90,7 @@ const onUpdatePlayerSettings = async (val: USIEngines) => {
 
 <style scoped>
 .root {
-  width: 560px;
+  width: 100%;
+  max-width: 560px;
 }
 </style>

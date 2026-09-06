@@ -7,6 +7,7 @@ import {
 import { GameSettings } from "@/common/settings/game.js";
 import { AppSettings } from "@/common/settings/app.js";
 import { webAPI } from "./web.js";
+import { androidAPI } from "./android.js";
 import { ResearchSettings } from "@/common/settings/research.js";
 import { AppState, ResearchState } from "@/common/control/state.js";
 import { GameResult } from "@/common/game/result.js";
@@ -102,16 +103,14 @@ export interface API {
   saveNextMoveGenerationSettings(settings: NextMoveGenerationSettings): Promise<void>;
 
   // Book
-  showOpenBookDialog(): Promise<string>;
-  showSaveBookDialog(session: number, targetFormat?: BookFormat): Promise<string>;
+  getBookFormat(session: number): Promise<BookFormat>;
+  getBookInfo(session: number): Promise<BookInfo>;
   openBook(session: number, path: string, options: BookLoadingOptions): Promise<void>;
   openBookAsNewSession(path: string, options: BookLoadingOptions): Promise<number>;
   closeBookSession(session: number): Promise<void>;
   saveBook(session: number, path: string): Promise<void>;
   exportBook(session: number, path: string, targetFormat: BookFormat): Promise<void>;
   clearBook(session: number, format?: BookFormat): Promise<void>;
-  getBookFormat(session: number): Promise<BookFormat>;
-  getBookInfo(session: number): Promise<BookInfo>;
   searchBookMoves(session: number, sfen: string): Promise<BookMove[]>;
   searchBookEntry(session: number, sfen: string): Promise<BookPositionEntry | null>;
   updateBookMove(session: number, sfen: string, move: BookMove): Promise<void>;
@@ -136,26 +135,6 @@ export interface API {
   usiStop(sessionID: number): Promise<void>;
   usiGameover(sessionID: number, result: GameResult): Promise<void>;
   usiQuit(sessionID: number): Promise<void>;
-
-  // CSA
-  csaLogin(settings: CSAServerSettings): Promise<number>;
-  csaLogout(sessionID: number): Promise<void>;
-  csaAgree(sessionID: number, gameID: string): Promise<void>;
-  csaMove(sessionID: number, move: string, score?: number, pv?: string): Promise<void>;
-  csaResign(sessionID: number): Promise<void>;
-  csaWin(sessionID: number): Promise<void>;
-  csaStop(sessionID: number): Promise<void>;
-
-  // Sessions
-  collectSessionStates(): Promise<SessionStates>;
-  setupPrompt(target: PromptTarget, sessionID: number): Promise<CommandHistory>;
-  openPrompt(target: PromptTarget, sessionID: number, name: string): void;
-  invokePromptCommand(
-    target: PromptTarget,
-    sessionID: number,
-    type: CommandType,
-    command: string,
-  ): void;
 
   // Images
   showSelectImageDialog(defaultURL?: string): Promise<string>;
@@ -196,7 +175,12 @@ function getWindowObject(): ExtendedWindow {
 
 export const appInfo: AppInfo = getWindowObject().electronShogi || {};
 
-export const bridge: Bridge = getWindowObject().electronShogiAPI || webAPI;
+
+export function isCapacitor(): boolean {
+  return !!(window as any).Capacitor;
+}
+
+export const bridge: Bridge = getWindowObject().electronShogiAPI || (isCapacitor() ? androidAPI : webAPI);
 
 const api: API = {
   ...bridge,
@@ -334,6 +318,9 @@ const api: API = {
   usiReady(sessionID: number): Promise<void> {
     return bridge.usiReady(sessionID);
   },
+  usiSetOption(sessionID: number, name: string, value: string): Promise<void> {
+    return bridge.usiSetOption(sessionID, name, value);
+  },
   usiGo(sessionID: number, usi: string, timeStates: TimeStates): Promise<void> {
     return bridge.usiGo(sessionID, usi, JSON.stringify(timeStates));
   },
@@ -388,14 +375,17 @@ const api: API = {
 
 export default api;
 
+
 export function isNative(): boolean {
-  return !!getWindowObject().electronShogiAPI;
+  return !!(getWindowObject() as any).electronShogiAPI;
 }
 
 export function isMobileWebApp(): boolean {
+  // If it's the desktop native (Electron) app, it's not a mobile web app.
   if (isNative()) {
     return false;
   }
-  const urlParams = new URL(window.location.toString()).searchParams;
-  return urlParams.has("mobile");
+  // Otherwise, treat it as a mobile-compatible environment.
+  // This includes Android/iOS apps (Capacitor) and mobile browsers.
+  return true;
 }

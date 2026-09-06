@@ -1,123 +1,125 @@
 <template>
   <DialogFrame limited @cancel="onCancel">
     <div class="title">{{ t.recordAnalysis }}</div>
-    <div v-if="isNative()" class="form-item center selector-item">
-      <HorizontalSelector
-        v-model:value="target"
-        :items="[
-          { label: t.currentRecord, value: 'record' },
-          { label: t.folder, value: 'batch' },
-        ]"
-      />
-    </div>
-    <div ref="scrollContainer" class="form-group scroll">
-      <div v-show="isNative() && target === 'batch'" class="form-group warning">
-        <div class="note">{{ t.analyzedRecordFilesWillBeOverwritten }}</div>
-      </div>
-      <div v-show="isNative() && target === 'batch'" class="form-group">
-        <div class="form-item row">
-          <input v-model="batchSettings.source" class="grow" type="text" />
-          <button class="thin" @click="selectSourceDirectory">
-            {{ t.select }}
-          </button>
-          <button class="thin open-dir" @click="openDirectory(batchSettings.source)">
-            <Icon :icon="IconType.OPEN_FOLDER" />
-          </button>
-        </div>
-        <div class="form-item">
-          <div class="form-item-label-wide">{{ t.formats }}</div>
-          <div class="formats">
-            <ToggleButton v-model:value="sourceFormats.kif" class="toggle" label=".kif" />
-            <ToggleButton v-model:value="sourceFormats.kifu" class="toggle" label=".kifu" />
-            <ToggleButton v-model:value="sourceFormats.ki2" class="toggle" label=".ki2" />
-            <ToggleButton v-model:value="sourceFormats.ki2u" class="toggle" label=".ki2u" />
-            <ToggleButton v-model:value="sourceFormats.csa" class="toggle" label=".csa" />
-            <ToggleButton v-model:value="sourceFormats.jkf" class="toggle" label=".jkf" />
-          </div>
-        </div>
-        <div class="form-item row">
-          <div class="form-item-label-wide">{{ t.subdirectories }}</div>
-          <ToggleButton v-model:value="batchSettings.subdirectories" class="toggle" />
-        </div>
-        <div class="form-item row">
-          <div class="form-item-label-wide">{{ t.skipAnalyzed }}</div>
-          <ToggleButton v-model:value="batchSettings.skipAnalyzed" class="toggle" />
-        </div>
-      </div>
-      <div class="form-group">
-        <div>{{ t.searchEngine }}</div>
-        <PlayerSelector
-          v-model:player-uri="engineURI"
-          :engines="engines"
-          :default-tag="getPredefinedUSIEngineTag('research')"
-          :display-thread-state="true"
-          :display-multi-pv-state="true"
-          @update-engines="onUpdatePlayerSettings"
+    <div class="main-content scroll">
+      <div v-if="isNative()" class="form-item center selector-item">
+        <HorizontalSelector
+          v-model:value="target"
+          :items="[
+            { label: t.currentRecord, value: 'record' },
+            { label: t.folder, value: 'batch' },
+          ]"
         />
       </div>
-      <div class="form-group">
-        <div>{{ t.startEndCriteria }}</div>
-        <div class="form-item">
-          <ToggleButton v-model:value="settings.startCriteria.enableNumber" />
-          <div class="form-item-small-label">{{ t.fromPrefix }}{{ t.plyPrefix }}</div>
-          <input
-            v-model.number="settings.startCriteria.number"
-            class="small"
-            type="number"
-            min="1"
-            step="1"
-            :disabled="!settings.startCriteria.enableNumber"
-          />
-          <div class="form-item-small-label">{{ t.plySuffix }}{{ t.fromSuffix }}</div>
+      <div ref="scrollContainer" class="form-group scroll">
+        <div v-show="isNative() && target === 'batch'" class="form-group warning">
+          <div class="note">{{ t.analyzedRecordFilesWillBeOverwritten }}</div>
         </div>
-        <div class="form-item">
-          <ToggleButton v-model:value="settings.endCriteria.enableNumber" />
-          <div class="form-item-small-label">{{ t.toPrefix }}{{ t.plyPrefix }}</div>
-          <input
-            v-model.number="settings.endCriteria.number"
-            class="small"
-            type="number"
-            min="1"
-            step="1"
-            :disabled="!settings.endCriteria.enableNumber"
-          />
-          <div class="form-item-small-label">{{ t.plySuffix }}{{ t.toSuffix }}</div>
-          <div v-show="target === 'record'" class="form-item-small-label">
-            ({{ t.totalMoves }}: {{ totalMoves }})
+        <div v-show="isNative() && target === 'batch'" class="form-group">
+          <div class="form-item row">
+            <input v-model="batchSettings.source" class="grow" type="text" />
+            <button class="thin" @click="selectSourceDirectory">
+              {{ t.select }}
+            </button>
+            <button class="thin open-dir" @click="openDirectory(batchSettings.source)">
+              <Icon :icon="IconType.OPEN_FOLDER" />
+            </button>
+          </div>
+          <div class="form-item">
+            <div class="form-item-label-wide">{{ t.formats }}</div>
+            <div class="formats">
+              <ToggleButton v-model:value="sourceFormats.kif" class="toggle" label=".kif" />
+              <ToggleButton v-model:value="sourceFormats.kifu" class="toggle" label=".kifu" />
+              <ToggleButton v-model:value="sourceFormats.ki2" class="toggle" label=".ki2" />
+              <ToggleButton v-model:value="sourceFormats.ki2u" class="toggle" label=".ki2u" />
+              <ToggleButton v-model:value="sourceFormats.csa" class="toggle" label=".csa" />
+              <ToggleButton v-model:value="sourceFormats.jkf" class="toggle" label=".jkf" />
+            </div>
+          </div>
+          <div class="form-item row">
+            <div class="form-item-label-wide">{{ t.subdirectories }}</div>
+            <ToggleButton v-model:value="batchSettings.subdirectories" class="toggle" />
+          </div>
+          <div class="form-item row">
+            <div class="form-item-label-wide">{{ t.skipAnalyzed }}</div>
+            <ToggleButton v-model:value="batchSettings.skipAnalyzed" class="toggle" />
           </div>
         </div>
-        <div class="form-item">
-          <ToggleButton v-model:value="settings.descending" :label="t.descending" />
-        </div>
-      </div>
-      <div class="form-group">
-        <div>{{ t.endCriteria1Move }}</div>
-        <div class="form-item">
-          <div class="form-item-small-label">{{ t.toPrefix }}</div>
-          <input
-            v-model.number="settings.perMoveCriteria.maxSeconds"
-            class="small"
-            type="number"
-            min="0"
-            step="1"
+        <div class="form-group">
+          <div>{{ t.searchEngine }}</div>
+          <PlayerSelector
+            v-model:player-uri="engineURI"
+            :engines="engines"
+            :default-tag="getPredefinedUSIEngineTag('research')"
+            :display-thread-state="true"
+            :display-multi-pv-state="true"
+            @update-engines="onUpdatePlayerSettings"
           />
-          <div class="form-item-small-label">{{ t.secondsSuffix }}{{ t.toSuffix }}</div>
         </div>
-      </div>
-      <div class="form-group">
-        <div>{{ t.outputSettings }}</div>
-        <div class="form-item">
-          <div class="form-item-label-wide">{{ t.moveComments }}</div>
-          <HorizontalSelector
-            v-model:value="settings.commentBehavior"
-            class="selector"
-            :items="[
-              { value: CommentBehavior.NONE, label: t.noOutputs },
-              { value: CommentBehavior.INSERT, label: t.insertCommentToTop },
-              { value: CommentBehavior.APPEND, label: t.appendCommentToBottom },
-              { value: CommentBehavior.OVERWRITE, label: t.overwrite },
-            ]"
-          />
+        <div class="form-group">
+          <div>{{ t.startEndCriteria }}</div>
+          <div class="form-item">
+            <ToggleButton v-model:value="settings.startCriteria.enableNumber" />
+            <div class="form-item-small-label">{{ t.fromPrefix }}{{ t.plyPrefix }}</div>
+            <input
+              v-model.number="settings.startCriteria.number"
+              class="small"
+              type="number"
+              min="1"
+              step="1"
+              :disabled="!settings.startCriteria.enableNumber"
+            />
+            <div class="form-item-small-label">{{ t.plySuffix }}{{ t.fromSuffix }}</div>
+          </div>
+          <div class="form-item">
+            <ToggleButton v-model:value="settings.endCriteria.enableNumber" />
+            <div class="form-item-small-label">{{ t.toPrefix }}{{ t.plyPrefix }}</div>
+            <input
+              v-model.number="settings.endCriteria.number"
+              class="small"
+              type="number"
+              min="1"
+              step="1"
+              :disabled="!settings.endCriteria.enableNumber"
+            />
+            <div class="form-item-small-label">{{ t.plySuffix }}{{ t.toSuffix }}</div>
+            <div v-show="target === 'record'" class="form-item-small-label">
+              ({{ t.totalMoves }}: {{ totalMoves }})
+            </div>
+          </div>
+          <div class="form-item">
+            <ToggleButton v-model:value="settings.descending" :label="t.descending" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div>{{ t.endCriteria1Move }}</div>
+          <div class="form-item">
+            <div class="form-item-small-label">{{ t.toPrefix }}</div>
+            <input
+              v-model.number="settings.perMoveCriteria.maxSeconds"
+              class="small"
+              type="number"
+              min="0"
+              step="1"
+            />
+            <div class="form-item-small-label">{{ t.secondsSuffix }}{{ t.toSuffix }}</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div>{{ t.outputSettings }}</div>
+          <div class="form-item">
+            <div class="form-item-label-wide">{{ t.moveComments }}</div>
+            <HorizontalSelector
+              v-model:value="settings.commentBehavior"
+              class="selector"
+              :items="[
+                { value: CommentBehavior.NONE, label: t.noOutputs },
+                { value: CommentBehavior.INSERT, label: t.insertCommentToTop },
+                { value: CommentBehavior.APPEND, label: t.appendCommentToBottom },
+                { value: CommentBehavior.OVERWRITE, label: t.overwrite },
+              ]"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -280,7 +282,8 @@ const onUpdatePlayerSettings = async (val: USIEngines) => {
 
 <style scoped>
 .form-group:not(.scroll) {
-  min-width: 480px;
+  width: 100%;
+  max-width: 480px;
 }
 .selector-item {
   margin: 0 !important;

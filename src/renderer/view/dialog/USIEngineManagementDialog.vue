@@ -97,6 +97,7 @@ import USIEngineOptionsDialog from "@/renderer/view/dialog/USIEngineOptionsDialo
 import { useAppSettings } from "@/renderer/store/settings";
 import { useErrorStore } from "@/renderer/store/error";
 import { useBusyState } from "@/renderer/store/busy";
+import { isCapacitor } from "@/renderer/ipc/api";
 import USIEngineMergeDialog from "./USIEngineMergeDialog.vue";
 import DialogFrame from "./DialogFrame.vue";
 import AddEngineTagDialog from "./AddEngineTagDialog.vue";
@@ -196,6 +197,10 @@ function onClickTag(tag: string) {
 }
 
 const add = async () => {
+  if (isCapacitor()) {
+    store.showOEXEngineSelectorDialog();
+    return;
+  }
   try {
     busyState.retain();
     const path = await api.showSelectUSIEngineDialog();
@@ -216,6 +221,7 @@ const add = async () => {
 
 const remove = (uri: string) => {
   usiEngines.value.removeEngine(uri);
+  usiEngines.value = usiEngines.value.getClone(); // Trigger reactivity
 };
 
 const showAddTagDialog = (uri: string) => {
@@ -238,14 +244,19 @@ const showAddTagDialog = (uri: string) => {
 const addTag = (tag: string) => {
   addTagDialog.value = false;
   usiEngines.value.addTag(addTagTarget.value, tag);
+  usiEngines.value = usiEngines.value.getClone(); // Trigger reactivity
 };
 
 const removeTag = (uri: string, tag: string) => {
   usiEngines.value.removeTag(uri, tag);
+  usiEngines.value = usiEngines.value.getClone(); // Trigger reactivity
 };
 
 const openOptions = (uri: string) => {
-  optionDialog.value = usiEngines.value.getEngine(uri) as USIEngine;
+  const e = usiEngines.value.getEngine(uri);
+  if (e) {
+    optionDialog.value = JSON.parse(JSON.stringify(e));
+  }
 };
 
 const openMerge = () => {
@@ -256,6 +267,7 @@ const duplicate = (uri: string) => {
   const src = usiEngines.value.getEngine(uri) as USIEngine;
   const engine = duplicateEngine(src);
   usiEngines.value.addEngine(engine);
+  usiEngines.value = usiEngines.value.getClone(); // Trigger reactivity
   lastAdded.value = scrollTo = engine.uri;
 };
 
@@ -296,7 +308,8 @@ const mergeCancel = () => {
 
 <style scoped>
 .engine-list {
-  width: 740px;
+  width: 100%;
+  max-width: 740px;
   height: calc(100vh - 280px);
   max-height: 600px;
   overflow: auto;
@@ -307,10 +320,12 @@ const mergeCancel = () => {
   align-items: center;
 }
 .filter-words {
-  width: 200px;
+  width: 100%;
+  max-width: 200px;
 }
 .filter-tags {
-  width: 540px;
+  width: 100%;
+  max-width: 540px;
   flex-wrap: wrap;
 }
 .filter-tag {
@@ -338,7 +353,8 @@ const mergeCancel = () => {
 }
 .engine-name {
   text-align: left;
-  width: 450px;
+  width: auto;
+  max-width: 450px;
   margin-top: 5px;
   margin-right: 10px;
   white-space: nowrap;
@@ -346,7 +362,8 @@ const mergeCancel = () => {
   text-overflow: ellipsis;
 }
 .tags {
-  width: 450px;
+  width: 100%;
+  max-width: 450px;
   flex-wrap: wrap;
 }
 .tag {

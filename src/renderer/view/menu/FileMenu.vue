@@ -6,21 +6,41 @@
           <Icon :icon="IconType.CLOSE" />
           <div class="label">{{ t.back }}</div>
         </button>
-      </div>
-      <div v-if="isMobileWebApp()" class="group">
-        <button @click="onFlip">
+        <button v-if="isMobileWebApp()" @click="onFlip">
           <Icon :icon="IconType.FLIP" />
           <div class="label">{{ t.flipBoard }}</div>
         </button>
-      </div>
-      <div v-if="isMobileWebApp()" class="group">
-        <button v-if="states.game" @click="onGame">
+        <button v-if="isMobileWebApp()" @click="onManageEngines">
+          <Icon :icon="IconType.ENGINE_SETTINGS" />
+          <div class="label">{{ t.manageEngines }}</div>
+        </button>
+        <button v-if="isMobileWebApp()" @click="onAppSettings">
+          <Icon :icon="IconType.SETTINGS" />
+          <div class="label">{{ t.appSettings }}</div>
+        </button>
+        <button v-if="isMobileWebApp()" @click="openCopyright">
+          <Icon :icon="IconType.LICENSE" />
+          <div class="label">{{ t.license }}</div>
+        </button>
+        <button v-if="isMobileWebApp() && states.stopGame" @click="onStopGame">
+          <Icon :icon="IconType.STOP" />
+          <div class="label">{{ t.stopGame }}</div>
+        </button>
+        <button v-if="isMobileWebApp() && states.game" @click="onGame">
           <Icon :icon="IconType.GAME" />
           <div class="label">{{ t.game }}</div>
         </button>
-        <button v-if="states.stopGame" @click="onStopGame">
-          <Icon :icon="IconType.STOP" />
-          <div class="label">{{ t.stopGame }}</div>
+        <button v-if="isMobileWebApp() && states.game" @click="onResearch">
+          <Icon :icon="IconType.RESEARCH" />
+          <div class="label">{{ t.research }}</div>
+        </button>
+        <button v-if="isMobileWebApp() && states.game" @click="onAnalysis">
+          <Icon :icon="IconType.ANALYSIS" />
+          <div class="label">{{ t.analysis }}</div>
+        </button>
+        <button v-if="isMobileWebApp() && states.game" @click="onMateSearch">
+          <Icon :icon="IconType.MATE_SEARCH" />
+          <div class="label">{{ t.mateSearch }}</div>
         </button>
       </div>
       <div class="group">
@@ -84,55 +104,37 @@
           <Icon :icon="IconType.OPEN_FOLDER" />
           <div class="label">{{ t.openAutoSaveDirectory }}</div>
         </button>
-      </div>
-      <div class="group">
-        <button @click="onCopyKIF">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsKIF }}</div>
-        </button>
-        <button @click="onCopyKI2">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsKI2 }}</div>
-        </button>
-        <button @click="onCopyCSA">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsCSA }}</div>
-        </button>
-        <button @click="onCopyJKF">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsJKF }}</div>
-        </button>
-        <button @click="onCopyUSI">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsUSI }}</div>
-        </button>
-        <button @click="onCopyUSEN">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsUSEN }}</div>
-        </button>
-        <button @click="onCopySFEN">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsSFEN }}</div>
-        </button>
-        <button @click="onCopyBOD">
-          <Icon :icon="IconType.COPY" />
-          <div class="label">{{ t.copyAsBOD }}</div>
-        </button>
-        <button :disabled="!states.paste" @click="onPaste">
+        <button @click="onPaste">
           <Icon :icon="IconType.PASTE" />
           <div class="label">{{ t.paste }}</div>
         </button>
-      </div>
-      <div v-if="isMobileWebApp()" class="group">
-        <button @click="onAppSettings">
-          <Icon :icon="IconType.SETTINGS" />
-          <div class="label">{{ t.appSettings }}</div>
+        <button @click="onCopyKIF">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">KIF</div>
         </button>
-      </div>
-      <div v-if="isMobileWebApp()" class="group">
-        <button @click="openCopyright">
-          <Icon :icon="IconType.LICENSE" />
-          <div class="label">{{ t.license }}</div>
+        <button @click="onCopyKI2">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">KI2</div>
+        </button>
+        <button @click="onCopyCSA">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">CSA</div>
+        </button>
+        <button @click="onCopyJKF">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">JKF</div>
+        </button>
+        <button @click="onCopyUSI">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">USI</div>
+        </button>
+        <button @click="onCopySFEN">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">SFEN</div>
+        </button>
+        <button @click="onCopyBOD">
+          <Icon :icon="IconType.COPY" />
+          <div class="label">BOD</div>
         </button>
       </div>
     </dialog>
@@ -184,7 +186,24 @@ const onFlip = () => {
   emit("close");
 };
 const onGame = () => {
-  isGameMenuVisible.value = true;
+  store.showGameDialog();
+  emit("close");
+};
+const onResearch = () => {
+  store.showResearchDialog();
+  emit("close");
+};
+const onAnalysis = () => {
+  store.showAnalysisDialog();
+  emit("close");
+};
+const onMateSearch = () => {
+  store.showMateSearchDialog();
+  emit("close");
+};
+const onManageEngines = () => {
+  store.showUsiEngineManagementDialog();
+  emit("close");
 };
 const onStopGame = () => {
   store.stopGame();

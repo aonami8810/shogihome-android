@@ -46,7 +46,7 @@ defineExpose({ dialog });
 <style scoped>
 dialog {
   width: calc(100vw - 3px - 2em);
-  height: calc(100vh - 3px - 2em);
+  height: calc(100dvh - 3px - 2em);
   border: none;
   box-shadow: none;
   background-color: transparent;
@@ -75,6 +75,10 @@ dialog {
   border-radius: 10px 10px 10px 10px;
   padding: 15px;
   cursor: default;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .frame.limited {

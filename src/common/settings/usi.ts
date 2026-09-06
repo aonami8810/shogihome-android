@@ -536,11 +536,18 @@ export class USIEngines {
   }
 
   get json(): string {
-    return JSON.stringify(this);
+    return JSON.stringify(this.toJSON());
   }
 
   get jsonWithIndent(): string {
-    return JSON.stringify(this, undefined, 2);
+    return JSON.stringify(this.toJSON(), undefined, 2);
+  }
+
+  toJSON() {
+    return {
+      engines: this.engines,
+      tagColorMapping: this.tagColorMapping,
+    };
   }
 
   getClone(): USIEngines {

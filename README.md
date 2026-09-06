@@ -157,3 +157,23 @@ npm run lint
 レンダラープロセスで使用しているライブラリは [THIRD PARTY LICENSES](https://sunfish-shogi.github.io/shogihome/third-party-licenses.html) を参照してください。
 
 Electron と Chromium については electron-builder によって成果物にバンドルされます。
+
+
+---
+
+## 📱 Android版 USI エンジン通信 & AIDL ディスカバリ アーキテクチャ
+
+ShogiHome Android における将棋エンジン連携は、以下のオープンかつスレッドセーフなアーキテクチャに基づいています。
+
+### 1. 動的プラグインディスカバリ (未知のエンジンの自動検出)
+- ShogiHome は特定のエンジンをハードコードするのではなく、Android 標準の **OEX (Open Engine Extension)** 規格に準拠しています。
+- OS の `PackageManager.queryIntentServices()` を用いて、`jp.shogidokoro.oex.ENGINE` または `shogi.oex.ENGINE` を公開している端末内の**すべての将棋エンジン（ATShogi、やねうら王、水匠、elmo 等）を動的にディスカバリ**し、対局エンジン一覧へ自動追加します。
+
+### 2. Promise ベースの非同期 FIFO コマンドキューイング
+- エンジンとの USI 通信は、Node.js イベントループ上で動作する **Promise ベースの FIFO コマンドキュー** により統制されています。
+- `isready` や `go` コマンドを発行すると、対応する完了シグナル（`readyok` や `bestmove`）を受信するまで Promise が非同期待機し、メッセージの順序性とスレッドセーフティが 100% 保証されます。
+- 中間思考情報（`info depth ... score ... pv ...`）は、非同期イベントリスナー経由で UI（評価値バー・読み筋リスト）へリアルタイムにストリーミング配信されます。
+
+### 3. 完全なカプセル化と疎結合
+- GUI とエンジンの境界は **「標準 USI プロトコル文字列（AIDL / stdin-stdout）」のみ** です。
+- エンジン内部の実装言語（Haskell、C++、Rust 等）や内部データ構造に依存せず、完全に疎結合なプラグインエコシステムを実現しています。

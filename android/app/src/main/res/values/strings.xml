@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ShogiHome</string>
+    <string name="title_activity_main">ShogiHome</string>
+    <string name="package_name">jp.shogihome.app</string>
+    <string name="custom_url_scheme">jp.shogihome.app</string>
+</resources>

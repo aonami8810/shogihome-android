@@ -544,7 +544,8 @@ class Store {
       this.appState === AppState.BOOK_PROPERTIES_DIALOG ||
       this.appState === AppState.SEARCH_DUPLICATE_POSITIONS_DIALOG ||
       this.appState === AppState.ELAPSED_TIME_CHART_DIALOG ||
-      this.appState === AppState.NEXT_MOVE_GENERATION_DIALOG
+      this.appState === AppState.NEXT_MOVE_GENERATION_DIALOG ||
+      this.appState === AppState.OEX_ENGINE_SELECTOR_DIALOG
     ) {
       this._appState = AppState.NORMAL;
     }
@@ -1164,6 +1165,12 @@ class Store {
   showNextMoveGenerationDialog(): void {
     if (this.appState === AppState.NORMAL) {
       this._appState = AppState.NEXT_MOVE_GENERATION_DIALOG;
+    }
+  }
+
+  showOEXEngineSelectorDialog(): void {
+    if (this.appState === AppState.USI_ENGINES_DIALOG) {
+      this._appState = AppState.OEX_ENGINE_SELECTOR_DIALOG;
     }
   }
 

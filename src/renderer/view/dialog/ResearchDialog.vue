@@ -2,6 +2,7 @@
   <DialogFrame @cancel="onCancel">
     <div class="root">
       <div class="title">{{ t.research }}</div>
+    <div class="main-content scroll">
       <div class="form-group">
         <PlayerSelector
           v-model:player-uri="engineURI"
@@ -65,6 +66,7 @@
           />
         </div>
       </div>
+    </div>
       <div class="main-buttons">
         <button data-hotkey="Enter" autofocus @click="onStart()">
           {{ t.startResearch }}
@@ -216,7 +218,8 @@ const onUpdatePlayerSettings = async (val: USIEngines) => {
 
 <style scoped>
 .root {
-  width: 450px;
+  width: 100%;
+  max-width: 450px;
 }
 .remove-button {
   margin-top: 5px;

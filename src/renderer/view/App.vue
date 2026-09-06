@@ -5,7 +5,7 @@
     :style="style"
   >
     <!-- Main Contents -->
-    <MobileLayout v-if="isMobileWebApp()" />
+    <MobileLayout v-if="mobile" />
     <CustomLayout v-else-if="store.customLayout" :profile="store.customLayout" />
     <StandardLayout v-else class="full" />
 
@@ -40,6 +40,11 @@
     <ElapsedTimeChartDialog v-if="store.appState === AppState.ELAPSED_TIME_CHART_DIALOG" />
     <NextMoveGenerationDialog v-if="store.appState === AppState.NEXT_MOVE_GENERATION_DIALOG" />
     <NextMoveGenerationProgressDialog v-if="store.appState === AppState.NEXT_MOVE_GENERATION" />
+    <OEXEngineSelectorDialog
+      v-if="store.appState === AppState.OEX_ENGINE_SELECTOR_DIALOG"
+      @select="onOEXEngineSelect"
+      @cancel="store.destroyModalDialog()"
+    />
     <MobileNextMoveQuizDialog
       v-if="nextMoveQuiz.visible && isMobileWebApp()"
       @close="nextMoveQuiz.hide()"
@@ -148,6 +153,7 @@ import { useConfirmationStore } from "@/renderer/store/confirm";
 import { useNextMoveQuizStore } from "@/renderer/store/nextmove";
 import CustomLayout from "./main/CustomLayout.vue";
 import MobileLayout from "./main/MobileLayout.vue";
+import OEXEngineSelectorDialog from "./dialog/OEXEngineSelectorDialog.vue";
 import api, { isMobileWebApp, isNative } from "@/renderer/ipc/api";
 import { openCopyright } from "@/renderer/helpers/copyright";
 import { installHotKeyForMainWindow } from "@/renderer/devices/hotkey";
@@ -163,6 +169,13 @@ const busyState = useBusyState();
 const confirmation = useConfirmationStore();
 const nextMoveQuiz = useNextMoveQuizStore();
 
+const windowWidth = ref(window.innerWidth);
+const windowHeight = ref(window.innerHeight);
+const updateWindowSize = () => {
+  windowWidth.value = window.innerWidth;
+  windowHeight.value = window.innerHeight;
+};
+
 const onCopy = () => {
   store.copyRecordKIF();
 };
@@ -171,7 +184,61 @@ const onPaste = () => {
   store.showPasteDialog();
 };
 
+const onOEXEngineSelect = async (engine: {
+  name: string;
+  packageName: string;
+  type: "aidl" | "oex";
+  authority?: string;
+}) => {
+  try {
+    store.destroyModalDialog();
+    useBusyState().retain();
+    const appSettings = useAppSettings();
+    const timeoutSeconds = appSettings.engineTimeoutSeconds;
+
+    // Get AIDL engine info
+    console.log("Fetching AIDL engine info for:", engine.packageName);
+    console.log("VERIFY: usiEngine fix applied 2026-08-13 15:30");
+    const usiEngine = await api.getUSIEngineInfo(engine.packageName, timeoutSeconds);
+    if (!usiEngine || !usiEngine.name) {
+      throw new Error("Received empty or invalid info from AIDL engine. Check ATShogi logs.");
+    }
+
+    // Ensure we have the latest engine list before adding
+    console.log("--- PERSISTENCE DEBUG START ---");
+    const usiEngines = await api.loadUSIEngines();
+    console.log("Current engine count in store:", usiEngines.engineList.length);
+
+    // URIをパッケージ名ベースの固定値にする（重複防止・上書き更新）
+    const stableUri = "es://usi-engine/aidl/" + engine.packageName;
+    console.log("Adding/Updating engine with stable URI:", stableUri);
+
+    usiEngine.uri = stableUri;
+    usiEngines.addEngine(usiEngine);
+
+    console.log("Saving updated USIEngines list to localStorage...");
+    await api.saveUSIEngines(usiEngines);
+
+    // Verification
+    const verify = await api.loadUSIEngines();
+    console.log("Verification - Total engine count:", verify.engineList.length);
+    console.log("--- PERSISTENCE DEBUG END ---");
+
+    store.destroyModalDialog();
+    setTimeout(() => {
+      console.log("Forcing engine management dialog to refresh...");
+      store.showUsiEngineManagementDialog();
+    }, 500);
+  } catch (e) {
+    console.error("Critical error during engine import:", e);
+    useErrorStore().add(e);
+  } finally {
+    useBusyState().release();
+  }
+};
+
 onMounted(() => {
+  window.addEventListener("resize", updateWindowSize);
   installHotKeyForMainWindow(clipboard.value);
   const body = document.getElementsByTagName("body")[0];
   body.addEventListener("dragover", (event: DragEvent) => {
@@ -226,6 +293,14 @@ const style = computed(() => {
     style["background-color"] = store.customLayout.backgroundColor;
   }
   return style;
+});
+
+const mobile = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  windowWidth.value; // dependency
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  windowHeight.value; // dependency
+  return isMobileWebApp();
 });
 </script>
 

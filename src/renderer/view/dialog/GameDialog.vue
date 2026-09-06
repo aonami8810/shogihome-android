@@ -6,351 +6,353 @@
         <ToggleButton v-model:value="gameSettings.sprtEnabled" label="SPRT" />
       </div>
     </div>
-    <div class="form-group full-column">
-      <div class="row regular-interval">
-        <div class="half-column">
-          <div v-if="gameSettings.sprtEnabled" class="top-label">{{ t.targetEngine }}</div>
-          <div v-else class="top-label">{{ t.senteOrShitate }}</div>
-          <PlayerSelector
-            v-model:player-uri="blackPlayerURI"
-            :contains-human="!gameSettings.sprtEnabled"
-            :contains-basic-engines="true"
-            :engines="engines"
-            :default-tag="getPredefinedUSIEngineTag('game')"
-            :display-ponder-state="true"
-            :display-thread-state="true"
-            :display-multi-pv-state="true"
-            @update-engines="onUpdatePlayerSettings"
-          />
+    <div class="main-content scroll">
+      <div class="form-group full-column">
+        <div class="row regular-interval">
+          <div class="half-column">
+            <div v-if="gameSettings.sprtEnabled" class="top-label">{{ t.targetEngine }}</div>
+            <div v-else class="top-label">{{ t.senteOrShitate }}</div>
+            <PlayerSelector
+              v-model:player-uri="blackPlayerURI"
+              :contains-human="!gameSettings.sprtEnabled"
+              :contains-basic-engines="true"
+              :engines="engines"
+              :default-tag="getPredefinedUSIEngineTag('game')"
+              :display-ponder-state="true"
+              :display-thread-state="true"
+              :display-multi-pv-state="true"
+              @update-engines="onUpdatePlayerSettings"
+            />
+          </div>
+          <div class="half-column">
+            <div v-if="gameSettings.sprtEnabled" class="top-label">{{ t.baseEngine }}</div>
+            <div v-else class="top-label">{{ t.goteOrUwate }}</div>
+            <PlayerSelector
+              v-if="whitePlayerURI"
+              v-model:player-uri="whitePlayerURI"
+              :contains-human="!gameSettings.sprtEnabled"
+              :contains-basic-engines="true"
+              :engines="engines"
+              :default-tag="getPredefinedUSIEngineTag('game')"
+              :display-ponder-state="true"
+              :display-thread-state="true"
+              :display-multi-pv-state="true"
+              @update-engines="onUpdatePlayerSettings"
+            />
+          </div>
         </div>
-        <div class="half-column">
-          <div v-if="gameSettings.sprtEnabled" class="top-label">{{ t.baseEngine }}</div>
-          <div v-else class="top-label">{{ t.goteOrUwate }}</div>
-          <PlayerSelector
-            v-if="whitePlayerURI"
-            v-model:player-uri="whitePlayerURI"
-            :contains-human="!gameSettings.sprtEnabled"
-            :contains-basic-engines="true"
-            :engines="engines"
-            :default-tag="getPredefinedUSIEngineTag('game')"
-            :display-ponder-state="true"
-            :display-thread-state="true"
-            :display-multi-pv-state="true"
-            @update-engines="onUpdatePlayerSettings"
-          />
+        <div class="row regular-interval">
+          <div class="half-column">
+            <div class="form-item">
+              <div class="form-item-label">{{ t.allottedTime }}</div>
+              <input v-model.number="hours" class="time" type="number" min="0" max="99" step="1" />
+              <div class="form-item-small-label">{{ t.hoursSuffix }}</div>
+              <input v-model.number="minutes" class="time" type="number" min="0" max="59" step="1" />
+              <div class="form-item-small-label">{{ t.minutesSuffix }}</div>
+            </div>
+            <div class="form-item">
+              <div class="form-item-label">{{ t.byoyomi }}</div>
+              <input v-model.number="byoyomi" class="time" type="number" min="0" max="60" step="1" />
+              <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
+            </div>
+            <div class="form-item">
+              <div class="form-item-label">{{ t.increments }}</div>
+              <input
+                v-model.number="increment"
+                class="time"
+                type="number"
+                min="0"
+                max="99"
+                step="1"
+              />
+              <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <ToggleButton
+                v-model:value="gameSettings.enableEngineTimeout"
+                :label="t.enableEngineTimeout"
+              />
+            </div>
+          </div>
+          <div class="half-column">
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <div class="form-item-label">{{ t.allottedTime }}</div>
+              <input
+                v-model.number="whiteHours"
+                class="time"
+                type="number"
+                min="0"
+                max="99"
+                step="1"
+                :disabled="!setDifferentTime"
+              />
+              <div class="form-item-small-label">{{ t.hoursSuffix }}</div>
+              <input
+                v-model.number="whiteMinutes"
+                class="time"
+                type="number"
+                min="0"
+                max="59"
+                step="1"
+                :disabled="!setDifferentTime"
+              />
+              <div class="form-item-small-label">{{ t.minutesSuffix }}</div>
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <div class="form-item-label">{{ t.byoyomi }}</div>
+              <input
+                v-model.number="whiteByoyomi"
+                class="time"
+                type="number"
+                min="0"
+                max="60"
+                step="1"
+                :disabled="!setDifferentTime"
+              />
+              <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <div class="form-item-label">{{ t.increments }}</div>
+              <input
+                v-model.number="whiteIncrement"
+                class="time"
+                type="number"
+                min="0"
+                max="99"
+                step="1"
+                :disabled="!setDifferentTime"
+              />
+              <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <ToggleButton v-model:value="setDifferentTime" :label="t.setDifferentTimeForGote" />
+            </div>
+            <div v-show="gameSettings.sprtEnabled" class="form-item">
+              <ToggleButton
+                v-model:value="gameSettings.enableEngineTimeout"
+                :label="t.enableEngineTimeout"
+              />
+            </div>
+          </div>
+        </div>
+        <div v-show="!gameSettings.sprtEnabled" class="players-control">
+          <button @click="onSwapColor">
+            <Icon :icon="IconType.SWAP_H" />
+            <span>{{ t.swapSenteGote }}</span>
+          </button>
         </div>
       </div>
-      <div class="row regular-interval">
-        <div class="half-column">
-          <div class="form-item">
-            <div class="form-item-label">{{ t.allottedTime }}</div>
-            <input v-model.number="hours" class="time" type="number" min="0" max="99" step="1" />
-            <div class="form-item-small-label">{{ t.hoursSuffix }}</div>
-            <input v-model.number="minutes" class="time" type="number" min="0" max="59" step="1" />
-            <div class="form-item-small-label">{{ t.minutesSuffix }}</div>
+      <div class="form-group full-column">
+        <div class="row regular-interval">
+          <div class="half-column">
+            <div class="form-item">
+              <div class="form-item-label">{{ t.startPosition }}</div>
+              <select v-model="gameSettings.startPosition">
+                <option value="current">{{ t.currentPosition }}</option>
+                <option value="sfen">SFEN</option>
+                <option value="list">{{ t.positionList }}</option>
+                <option :value="InitialPositionType.STANDARD">
+                  {{ t.noHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_LANCE">
+                  {{ t.lanceHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_RIGHT_LANCE">
+                  {{ t.rightLanceHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_BISHOP">
+                  {{ t.bishopHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_ROOK">
+                  {{ t.rookHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_ROOK_LANCE">
+                  {{ t.rookLanceHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_2PIECES">
+                  {{ t.twoPiecesHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_4PIECES">
+                  {{ t.fourPiecesHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_6PIECES">
+                  {{ t.sixPiecesHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_8PIECES">
+                  {{ t.eightPiecesHandicap }}
+                </option>
+                <option :value="InitialPositionType.HANDICAP_10PIECES">
+                  {{ t.tenPiecesHandicap }}
+                </option>
+              </select>
+            </div>
+            <div v-show="gameSettings.startPosition === 'list'" class="form-item">
+              <input v-model="gameSettings.startPositionListFile" type="text" placeholder="*.sfen" />
+              <button class="thin" @click="onSelectStartPositionListFile">{{ t.select }}</button>
+            </div>
+            <div v-show="gameSettings.startPosition === 'sfen'" class="form-item">
+              <input
+                v-model="gameSettings.startPositionSFEN"
+                class="sfen"
+                type="text"
+                placeholder="sfen lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"
+              />
+            </div>
+            <div v-show="gameSettings.startPosition === 'list'" class="form-item">
+              <ToggleButton v-model:value="startPositionListShuffle" :label="t.shuffle" />
+            </div>
+            <div v-show="gameSettings.startPosition === 'list'" class="form-item">
+              <ToggleButton v-model:value="startPositionListPlyEnabled" />
+              <div class="form-item-small-label">{{ t.plyPrefix }}</div>
+              <input
+                v-model.number="startPositionListPly"
+                class="number small"
+                type="number"
+                min="1"
+                step="1"
+                :disabled="!startPositionListPlyEnabled"
+              />
+              <div class="form-item-small-label">{{ t.plySuffix }}</div>
+            </div>
+            <div class="form-item">
+              <div class="form-item-label">{{ t.maxMoves }}</div>
+              <input v-model.number="gameSettings.maxMoves" class="number" type="number" min="1" />
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <div class="form-item-label">{{ t.gameRepetition }}</div>
+              <input v-model.number="gameSettings.repeat" class="number" type="number" min="1" />
+            </div>
+            <div class="form-item">
+              <div class="form-item-label">{{ t.parallelism }}</div>
+              <input v-model.number="gameSettings.parallelism" class="number" type="number" min="1" />
+            </div>
+            <div class="form-item">
+              <div class="form-item-label">{{ t.jishogi }}</div>
+              <select v-model="gameSettings.jishogiRule">
+                <option :value="JishogiRule.NONE">{{ t.none }}</option>
+                <option :value="JishogiRule.GENERAL24">{{ t.rule24 }}</option>
+                <option :value="JishogiRule.GENERAL27">{{ t.rule27 }}</option>
+                <option :value="JishogiRule.TRY">{{ t.tryRule }}</option>
+              </select>
+            </div>
           </div>
-          <div class="form-item">
-            <div class="form-item-label">{{ t.byoyomi }}</div>
-            <input v-model.number="byoyomi" class="time" type="number" min="0" max="60" step="1" />
-            <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
-          </div>
-          <div class="form-item">
-            <div class="form-item-label">{{ t.increments }}</div>
-            <input
-              v-model.number="increment"
-              class="time"
-              type="number"
-              min="0"
-              max="99"
-              step="1"
-            />
-            <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <ToggleButton
-              v-model:value="gameSettings.enableEngineTimeout"
-              :label="t.enableEngineTimeout"
-            />
-          </div>
-        </div>
-        <div class="half-column">
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <div class="form-item-label">{{ t.allottedTime }}</div>
-            <input
-              v-model.number="whiteHours"
-              class="time"
-              type="number"
-              min="0"
-              max="99"
-              step="1"
-              :disabled="!setDifferentTime"
-            />
-            <div class="form-item-small-label">{{ t.hoursSuffix }}</div>
-            <input
-              v-model.number="whiteMinutes"
-              class="time"
-              type="number"
-              min="0"
-              max="59"
-              step="1"
-              :disabled="!setDifferentTime"
-            />
-            <div class="form-item-small-label">{{ t.minutesSuffix }}</div>
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <div class="form-item-label">{{ t.byoyomi }}</div>
-            <input
-              v-model.number="whiteByoyomi"
-              class="time"
-              type="number"
-              min="0"
-              max="60"
-              step="1"
-              :disabled="!setDifferentTime"
-            />
-            <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <div class="form-item-label">{{ t.increments }}</div>
-            <input
-              v-model.number="whiteIncrement"
-              class="time"
-              type="number"
-              min="0"
-              max="99"
-              step="1"
-              :disabled="!setDifferentTime"
-            />
-            <div class="form-item-small-label">{{ t.secondsSuffix }}</div>
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <ToggleButton v-model:value="setDifferentTime" :label="t.setDifferentTimeForGote" />
-          </div>
-          <div v-show="gameSettings.sprtEnabled" class="form-item">
-            <ToggleButton
-              v-model:value="gameSettings.enableEngineTimeout"
-              :label="t.enableEngineTimeout"
-            />
+          <div class="half-column">
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <ToggleButton
+                v-model:value="gameSettings.swapPlayers"
+                :label="t.swapTurnWhenGameRepetition"
+              />
+            </div>
+            <div class="form-item">
+              <ToggleButton v-model:value="gameSettings.enableComment" :label="t.outputComments" />
+            </div>
+            <div v-show="!gameSettings.sprtEnabled" class="form-item">
+              <ToggleButton
+                v-model:value="gameSettings.humanIsFront"
+                :label="t.adjustBoardToHumanPlayer"
+              />
+            </div>
+            <div class="form-item">
+              <ToggleButton
+                v-model:value="gameSettings.enableAutoSave"
+                :label="t.saveRecordAutomatically"
+              />
+            </div>
+            <div class="form-item">
+              <input
+                v-model="gameSettings.autoSaveDirectory"
+                type="text"
+                :disabled="!gameSettings.enableAutoSave"
+              />
+              <button class="thin" @click="selectAutoSaveDirectory">
+                {{ t.select }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <div v-show="!gameSettings.sprtEnabled" class="players-control">
-        <button @click="onSwapColor">
-          <Icon :icon="IconType.SWAP_H" />
-          <span>{{ t.swapSenteGote }}</span>
-        </button>
-      </div>
-    </div>
-    <div class="form-group full-column">
-      <div class="row regular-interval">
-        <div class="half-column">
-          <div class="form-item">
-            <div class="form-item-label">{{ t.startPosition }}</div>
-            <select v-model="gameSettings.startPosition">
-              <option value="current">{{ t.currentPosition }}</option>
-              <option value="sfen">SFEN</option>
-              <option value="list">{{ t.positionList }}</option>
-              <option :value="InitialPositionType.STANDARD">
-                {{ t.noHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_LANCE">
-                {{ t.lanceHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_RIGHT_LANCE">
-                {{ t.rightLanceHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_BISHOP">
-                {{ t.bishopHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_ROOK">
-                {{ t.rookHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_ROOK_LANCE">
-                {{ t.rookLanceHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_2PIECES">
-                {{ t.twoPiecesHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_4PIECES">
-                {{ t.fourPiecesHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_6PIECES">
-                {{ t.sixPiecesHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_8PIECES">
-                {{ t.eightPiecesHandicap }}
-              </option>
-              <option :value="InitialPositionType.HANDICAP_10PIECES">
-                {{ t.tenPiecesHandicap }}
-              </option>
-            </select>
-          </div>
-          <div v-show="gameSettings.startPosition === 'list'" class="form-item">
-            <input v-model="gameSettings.startPositionListFile" type="text" placeholder="*.sfen" />
-            <button class="thin" @click="onSelectStartPositionListFile">{{ t.select }}</button>
-          </div>
-          <div v-show="gameSettings.startPosition === 'sfen'" class="form-item">
+      <div v-if="gameSettings.sprtEnabled" class="form-group full-column">
+        <div class="form-item row">
+          <div class="parameter">
+            <span class="label small">Elo0</span>
             <input
-              v-model="gameSettings.startPositionSFEN"
-              class="sfen"
-              type="text"
-              placeholder="sfen lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"
-            />
-          </div>
-          <div v-show="gameSettings.startPosition === 'list'" class="form-item">
-            <ToggleButton v-model:value="startPositionListShuffle" :label="t.shuffle" />
-          </div>
-          <div v-show="gameSettings.startPosition === 'list'" class="form-item">
-            <ToggleButton v-model:value="startPositionListPlyEnabled" />
-            <div class="form-item-small-label">{{ t.plyPrefix }}</div>
-            <input
-              v-model.number="startPositionListPly"
+              v-model.number="gameSettings.sprt.elo0"
               class="number small"
               type="number"
-              min="1"
-              step="1"
-              :disabled="!startPositionListPlyEnabled"
-            />
-            <div class="form-item-small-label">{{ t.plySuffix }}</div>
-          </div>
-          <div class="form-item">
-            <div class="form-item-label">{{ t.maxMoves }}</div>
-            <input v-model.number="gameSettings.maxMoves" class="number" type="number" min="1" />
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <div class="form-item-label">{{ t.gameRepetition }}</div>
-            <input v-model.number="gameSettings.repeat" class="number" type="number" min="1" />
-          </div>
-          <div class="form-item">
-            <div class="form-item-label">{{ t.parallelism }}</div>
-            <input v-model.number="gameSettings.parallelism" class="number" type="number" min="1" />
-          </div>
-          <div class="form-item">
-            <div class="form-item-label">{{ t.jishogi }}</div>
-            <select v-model="gameSettings.jishogiRule">
-              <option :value="JishogiRule.NONE">{{ t.none }}</option>
-              <option :value="JishogiRule.GENERAL24">{{ t.rule24 }}</option>
-              <option :value="JishogiRule.GENERAL27">{{ t.rule27 }}</option>
-              <option :value="JishogiRule.TRY">{{ t.tryRule }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="half-column">
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <ToggleButton
-              v-model:value="gameSettings.swapPlayers"
-              :label="t.swapTurnWhenGameRepetition"
+              step="0.5"
             />
           </div>
-          <div class="form-item">
-            <ToggleButton v-model:value="gameSettings.enableComment" :label="t.outputComments" />
-          </div>
-          <div v-show="!gameSettings.sprtEnabled" class="form-item">
-            <ToggleButton
-              v-model:value="gameSettings.humanIsFront"
-              :label="t.adjustBoardToHumanPlayer"
-            />
-          </div>
-          <div class="form-item">
-            <ToggleButton
-              v-model:value="gameSettings.enableAutoSave"
-              :label="t.saveRecordAutomatically"
-            />
-          </div>
-          <div class="form-item">
+          <div class="parameter">
+            <span class="label small">Elo1</span>
             <input
-              v-model="gameSettings.autoSaveDirectory"
-              type="text"
-              :disabled="!gameSettings.enableAutoSave"
+              v-model.number="gameSettings.sprt.elo1"
+              class="number small"
+              type="number"
+              step="0.5"
             />
-            <button class="thin" @click="selectAutoSaveDirectory">
-              {{ t.select }}
-            </button>
+          </div>
+          <div class="row wrap preset">
+            <button @click="setEloPreset(0.5, 2.5)">[0.5, 2.5]</button>
+            <button @click="setEloPreset(0, 2)">[0, 2]</button>
+            <button @click="setEloPreset(0, 3)">[0, 3]</button>
+            <button @click="setEloPreset(-1.75, 0.25)">[-1.75, 0.25]</button>
+            <button @click="setEloPreset(-3, 1)">[-3, 1]</button>
+          </div>
+        </div>
+        <div class="form-item row">
+          <div class="parameter">
+            <span class="label small">&alpha;</span>
+            <input
+              v-model.number="gameSettings.sprt.alpha"
+              class="number small"
+              type="number"
+              min="0.01"
+              max="0.5"
+              step="0.01"
+            />
+          </div>
+          <div class="parameter">
+            <span class="label small">&beta;</span>
+            <input
+              v-model.number="gameSettings.sprt.beta"
+              class="number small"
+              type="number"
+              min="0.01"
+              max="0.5"
+              step="0.01"
+            />
+          </div>
+          <div class="row wrap preset">
+            <button @click="setAlphaBetaPreset(0.05)">5%</button>
+            <button @click="setAlphaBetaPreset(0.01)">1%</button>
+          </div>
+        </div>
+        <div class="form-item row">
+          <div class="parameter">
+            <!-- TODO: i18n -->
+            <span class="label">MaxGames</span>
+            <input
+              v-model.number="gameSettings.sprt.maxGames"
+              class="number"
+              type="number"
+              min="100"
+              step="1000"
+            />
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="gameSettings.sprtEnabled" class="form-group full-column">
-      <div class="form-item row">
-        <div class="parameter">
-          <span class="label small">Elo0</span>
-          <input
-            v-model.number="gameSettings.sprt.elo0"
-            class="number small"
-            type="number"
-            step="0.5"
-          />
-        </div>
-        <div class="parameter">
-          <span class="label small">Elo1</span>
-          <input
-            v-model.number="gameSettings.sprt.elo1"
-            class="number small"
-            type="number"
-            step="0.5"
-          />
-        </div>
-        <div class="row wrap preset">
-          <button @click="setEloPreset(0.5, 2.5)">[0.5, 2.5]</button>
-          <button @click="setEloPreset(0, 2)">[0, 2]</button>
-          <button @click="setEloPreset(0, 3)">[0, 3]</button>
-          <button @click="setEloPreset(-1.75, 0.25)">[-1.75, 0.25]</button>
-          <button @click="setEloPreset(-3, 1)">[-3, 1]</button>
-        </div>
+      <div v-if="cpuUsage > 1.0" class="form-group danger">
+        <div class="note">{{ t.totalNumberOfThreadsExceedsNPercentOfCpuCores(100) }}</div>
       </div>
-      <div class="form-item row">
-        <div class="parameter">
-          <span class="label small">&alpha;</span>
-          <input
-            v-model.number="gameSettings.sprt.alpha"
-            class="number small"
-            type="number"
-            min="0.01"
-            max="0.5"
-            step="0.01"
-          />
-        </div>
-        <div class="parameter">
-          <span class="label small">&beta;</span>
-          <input
-            v-model.number="gameSettings.sprt.beta"
-            class="number small"
-            type="number"
-            min="0.01"
-            max="0.5"
-            step="0.01"
-          />
-        </div>
-        <div class="row wrap preset">
-          <button @click="setAlphaBetaPreset(0.05)">5%</button>
-          <button @click="setAlphaBetaPreset(0.01)">1%</button>
-        </div>
+      <div v-else-if="cpuUsage > 0.9" class="form-group warning">
+        <div class="note">{{ t.totalNumberOfThreadsExceedsNPercentOfCpuCores(90) }}</div>
       </div>
-      <div class="form-item row">
-        <div class="parameter">
-          <!-- TODO: i18n -->
-          <span class="label">MaxGames</span>
-          <input
-            v-model.number="gameSettings.sprt.maxGames"
-            class="number"
-            type="number"
-            min="100"
-            step="1000"
-          />
-        </div>
+      <div v-if="memoryUsage > 1.0" class="form-group danger">
+        <div class="note">{{ t.totalUSIHashExceedsNPercentOfMemory(100) }}</div>
       </div>
-    </div>
-    <div v-if="cpuUsage > 1.0" class="form-group danger">
-      <div class="note">{{ t.totalNumberOfThreadsExceedsNPercentOfCpuCores(100) }}</div>
-    </div>
-    <div v-else-if="cpuUsage > 0.9" class="form-group warning">
-      <div class="note">{{ t.totalNumberOfThreadsExceedsNPercentOfCpuCores(90) }}</div>
-    </div>
-    <div v-if="memoryUsage > 1.0" class="form-group danger">
-      <div class="note">{{ t.totalUSIHashExceedsNPercentOfMemory(100) }}</div>
-    </div>
-    <div v-else-if="memoryUsage > 0.8" class="form-group warning">
-      <div class="note">{{ t.totalUSIHashExceedsNPercentOfMemory(80) }}</div>
+      <div v-else-if="memoryUsage > 0.8" class="form-group warning">
+        <div class="note">{{ t.totalUSIHashExceedsNPercentOfMemory(80) }}</div>
+      </div>
     </div>
     <div class="main-buttons">
       <button data-hotkey="Enter" autofocus @click="onStart()">
@@ -424,6 +426,9 @@ busyState.retain();
 onMounted(async () => {
   try {
     gameSettings.value = await api.loadGameSettings();
+    if (gameSettings.value.maxMoves === 1000) {
+      gameSettings.value.maxMoves = 512;
+    }
     engines.value = await api.loadUSIEngines();
     blackPlayerURI.value = gameSettings.value.black.uri;
     whitePlayerURI.value = gameSettings.value.white.uri;
@@ -638,6 +643,9 @@ const selectAutoSaveDirectory = async () => {
 .header {
   position: relative;
 }
+.main-content {
+  flex: 1;
+}
 .mode-selector {
   position: absolute;
   right: 0px;
@@ -648,10 +656,12 @@ const selectAutoSaveDirectory = async () => {
   text-align: center;
 }
 .full-column {
-  width: 580px;
+  width: 100%;
+  max-width: 580px;
 }
 .half-column {
-  width: 280px;
+  width: 100%;
+  max-width: 280px;
 }
 .players-control {
   width: 100%;
